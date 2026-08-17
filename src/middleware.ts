@@ -1,26 +1,40 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 
-/** Keeps the admin's login session fresh so server-side checks stay reliable. */
+/**
+ * Keeps the admin's login session fresh so server-side checks stay reliable.
+ *
+ * This runs on every request, so it must never be able to break the site. If
+ * anything at all goes wrong (bad key, Supabase unreachable, misconfigured
+ * URL) we quietly carry on - the visitor still gets their birthday page.
+ */
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next({ request });
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return response;
+  try {
+    const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() ?? '';
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ?? '';
+    const url = rawUrl.replace(/\/+$/, '');
 
-  const supabase = createServerClient(url, key, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
-      setAll(list: { name: string; value: string; options: CookieOptions }[]) {
-        list.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
-      },
-    },
-  });
+    // Nothing to refresh, or the URL is not usable.
+    if (!url || !key || !/^https?:\/\//i.test(url)) return response;
 
-  await supabase.auth.getUser();
+    const supabase = createServerClient(url, key, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(list: { name: string; value: string; options: CookieOptions }[]) {
+          list.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+        },
+      },
+    });
+
+    await supabase.auth.getUser();
+  } catch {
+    /* Session refresh is a nice-to-have, never a reason to fail the request. */
+  }
+
   return response;
 }
 
