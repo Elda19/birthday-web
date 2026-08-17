@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --accent: #2563eb;
+  --accent-soft: #4f83f1;
+  --font-display: 'Baloo 2', 'Trebuchet MS', ui-rounded, system-ui, sans-serif;
+  --font-body: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-hand: 'Caveat', 'Segoe Script', cursive;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+html {
+  /* Keeps iOS from bouncing the whole document sideways. */
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  color: #3b3357;
+  background-color: #f5f1fc;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* --------------------------------------------------------------------------
+   Soft pastel backdrop: lavender/pink wash + a tiny confetti-dot pattern.
+   Lives behind everything and fills the whole browser window.
+---------------------------------------------------------------------------*/
+.bg-birthday {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-color: #f3eefc;
+  background-image:
+    radial-gradient(120% 80% at 12% 0%, #ffe6f0 0%, rgba(255, 230, 240, 0) 55%),
+    radial-gradient(110% 70% at 92% 8%, #e2e9ff 0%, rgba(226, 233, 255, 0) 60%),
+    radial-gradient(120% 90% at 50% 105%, #f0e7fd 0%, rgba(240, 231, 253, 0) 60%),
+    linear-gradient(180deg, #f8f3fd 0%, #efe9fb 45%, #f6effa 100%);
+}
+
+.bg-birthday::after {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  opacity: 0.7;
+  background-image:
+    radial-gradient(circle, rgba(255, 158, 190, 0.55) 1.6px, transparent 1.7px),
+    radial-gradient(circle, rgba(139, 176, 255, 0.5) 1.4px, transparent 1.5px),
+    radial-gradient(circle, rgba(255, 214, 128, 0.42) 1.2px, transparent 1.3px);
+  background-size: 46px 46px, 62px 62px, 88px 88px;
+  background-position: 0 0, 22px 30px, 46px 12px;
+}
+
+/* --------------------------------------------------------------------------
+   Scrollbars: keep them out of the way on desktop.
+---------------------------------------------------------------------------*/
+.tidy-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 105, 180, 0.35) transparent;
+}
+.tidy-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.tidy-scroll::-webkit-scrollbar-thumb {
+  background: rgba(120, 105, 180, 0.3);
+  border-radius: 999px;
+}
+
+/* Prevents long unbroken words (links, gibberish) from causing overflow. */
+.wrap-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .float-slow,
+  .wiggle,
+  .pulse-soft {
+    animation: none !important;
+  }
+}
+
+/* Gentle idle float for the character. */
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+.float-slow {
+  animation: floaty 4.2s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(-1.6deg);
+  }
+  50% {
+    transform: rotate(1.6deg);
+  }
+}
+.wiggle {
+  animation: wiggle 5s ease-in-out infinite;
+}
+
+@keyframes pulseSoft {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+.pulse-soft {
+  animation: pulseSoft 2.6s ease-in-out infinite;
+}
+
+/* Focus ring that looks intentional rather than browser-default. */
+:where(button, a, [tabindex]):focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
